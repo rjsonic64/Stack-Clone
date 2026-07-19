@@ -1,0 +1,1 @@
+/usr/bin/c++  -std=c++17 -Wall -Wextra -arch arm64 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/StackClone.dir/Backend/src/main.cpp.o -o StackClone

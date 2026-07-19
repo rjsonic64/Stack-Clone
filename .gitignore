@@ -1,0 +1,3 @@
+build/
+CMakeLists.txt
+Backend/Parser/Config/ParserConfig.json
