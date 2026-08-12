@@ -345,7 +345,7 @@ namespace TSVEngine
             }
 
             // Parse file
-            const size_t CHUNK_SIZE = 250000;
+            const size_t CHUNK_SIZE = 5000;
 
             RowData chunk;
 

@@ -1,1 +1,0 @@
-/usr/bin/c++  -std=c++17 -Wall -Wextra -arch arm64 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/StackImporter.dir/Backend/Parser/parser.cpp.o -o StackImporter   -L/opt/homebrew/Cellar/libssh/0.12.0_1/lib  -Wl,-rpath,/opt/homebrew/Cellar/libssh/0.12.0_1/lib -lmysql::concpp-jdbc -lssh

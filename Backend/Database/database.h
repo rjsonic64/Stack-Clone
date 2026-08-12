@@ -72,6 +72,9 @@ namespace Database
             return sess;
         }
 
+		// API functions
+		std::string get_post(int, std::string&, std::string&);
+
         int bulkLoad
         (
             mysqlx::Session&,

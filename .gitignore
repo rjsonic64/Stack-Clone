@@ -1,3 +1,4 @@
 build/
 CMakeLists.txt
 Backend/Parser/Config/ParserConfig.json
+API/Config/config.json

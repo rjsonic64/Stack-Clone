@@ -1,4 +1,0 @@
-/Users/rj/Documents/VSCode/StackClone/CMakeFiles/StackClone.dir
-/Users/rj/Documents/VSCode/StackClone/CMakeFiles/StackImporter.dir
-/Users/rj/Documents/VSCode/StackClone/CMakeFiles/edit_cache.dir
-/Users/rj/Documents/VSCode/StackClone/CMakeFiles/rebuild_cache.dir

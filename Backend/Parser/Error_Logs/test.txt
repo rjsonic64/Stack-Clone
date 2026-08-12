@@ -1,0 +1,10 @@
+Error log for file: test.tsv
+# -----------------------------#
+Total Rows: 5
+Rows Discarded: 0
+
+Bad Intergers: 0
+Bad Dates: 0
+Malformed Rows: 0
+
+Time finished: 0sec

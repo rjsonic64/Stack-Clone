@@ -7,6 +7,7 @@
 #include <unistd.h>
 
 // Containers
+#include <atomic>
 #include <optional>
 
 // Socket handling
@@ -16,6 +17,9 @@
 // File handling
 #include <fstream>
 #include <sstream>
+
+// Mutex headers
+#include <mutex>
 
 // I/O
 #include <thread>
@@ -455,20 +459,44 @@ namespace SSH
                 throw std::runtime_error("Remote SSH | Failed to start session.\n");
             }
 
-            bool alive = true;
+            struct timeval tv;
+            tv.tv_sec = 1;
+            tv.tv_usec = 0;
+            setsockopt(mysqlx_socket, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
+            setsockopt(mysqlx_socket, SOL_SOCKET, SO_SNDTIMEO, &tv, sizeof(tv));
+
+            std::atomic<bool> alive = true;
             
             auto ClitS = [&]()
-            {
-                unsigned char buffer[256];
+            { 
+                unsigned char buffer[16384];
                 int nbytes;
 
-                while (true)
+                while (alive.load())
                 {
                     if (!alive) break;
 
                     nbytes = recv(mysqlx_socket, buffer, sizeof(buffer), 0);
-                    if (nbytes < 0) break;
-                    if (nbytes == 0) break;
+                    if (nbytes < 0)
+                    {
+                        if (errno == EAGAIN || errno == EWOULDBLOCK || errno == EINTR)
+                        {
+                            std::this_thread::sleep_for(std::chrono::milliseconds(5));
+                            continue;
+                        }
+
+                        alive = false;
+                        shutdown(mysqlx_socket, SHUT_RDWR);
+                        ssh_channel_close(TCP_tunnel);
+                        break;
+                    }
+                    if (nbytes == 0)
+                    {
+                        alive = false;
+                        shutdown(mysqlx_socket, SHUT_RDWR);
+                        ssh_channel_close(TCP_tunnel);
+                        break;
+                    }
 
                     int total = 0;
 
@@ -478,15 +506,17 @@ namespace SSH
                         if (sent <= 0) return;
                         total += sent;
                     }
+
+                    if (!alive) break;
                 }
             };
 
             auto StCli = [&]()
             {
-                unsigned char buffer[256];
+                unsigned char buffer[16384];
                 int nbytes;
 
-                while (true)
+                while (alive.load())
                 {
                     if (!alive) break;
 
@@ -507,6 +537,8 @@ namespace SSH
                         if (sent <= 0) return;
                         total += sent;
                     }
+
+                    if (!alive) break;
                 }
             };
 
@@ -543,7 +575,7 @@ namespace SSH
         ssh_channel_close(TCP_tunnel);
         ssh_channel_free(TCP_tunnel);
         TCP_tunnel = nullptr;
-        return SSH_ERROR;
+        return SSH_OK;
     }
 
 }

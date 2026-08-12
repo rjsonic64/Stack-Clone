@@ -72,6 +72,7 @@ namespace Database
                 std::cout << "Error: "
                           << err.what()
                           << '\n';
+				std::cout << "--------\n" << std::flush;
             }
 
             // Subprocess
@@ -146,6 +147,51 @@ namespace Database
     }
 
     // MySql class functions
+
+	// API functions
+	std::string MySql::get_post(int Id, std::string& db_name, std::string& table_name)
+	{
+		try
+		{
+			std::string query = 
+				"SELECT * FROM " + db_name + '.' + table_name + " WHERE Id = " + std::to_string(Id) + ';';
+			auto result = sess.sql(query).execute();
+			auto row = result.fetchOne();
+
+			std::string finished_row;
+			for (unsigned i = 0; i < row.colCount(); ++i)
+			{
+				auto value = row[i];
+
+				switch (value.getType())
+				{
+					case mysqlx::Value::Type::STRING:
+					{
+						finished_row += " " + value.get<std::string>();
+						break;
+					}
+					case mysqlx::Value::Type::INT64:
+					{
+						finished_row += " " + std::to_string(value.get<int64_t>());
+						break;
+					}
+					case mysqlx::Value::Type::VNULL:
+					{
+						finished_row += " NULL";
+						break;
+					}
+				}
+			}
+
+			return finished_row;
+		}
+		catch(std::exception& err)
+		{
+			return "Id not found in database";
+		}
+	}
+
+	// Parser
 	int MySql::getColumnCount
 	(
 		mysqlx::Session& session,
